@@ -3,7 +3,7 @@ import React from "react";
 export default function Die(props) {
   const style = `die ${props.properties.isActive ? "die-active" : ""}`;
   const dieValue = props.properties.value;
-  const dieName = `dice${dieValue}`;
+  const dieName = `Dice${dieValue}`;
   const imageSrc = `/src/images/${dieName}.png`;
   console.log(imageSrc);
 
