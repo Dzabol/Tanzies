@@ -8,7 +8,11 @@ export default function Die(props) {
 
   return (
     <div className={style} onClick={props.clickHandler}>
-      <img src={imageSrc} className="die-image" />
+      <img
+        src={imageSrc}
+        className="die-image"
+        alt={`Die with number ${dieValue}`}
+      />
     </div>
   );
 }
