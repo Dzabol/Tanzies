@@ -1,22 +1,37 @@
-import { React, useState } from "react";
+import { React, useState, useEffect } from "react";
 import Die from "./components/Die";
+import ScoreBoard from "./components/ScoreBoard";
+import PlayButton from "./components/PlayButton";
 
 function App() {
-  const [dice, setDice] = useState(generateNumbers(10));
+  const numberOfDicesInTheGame = 10;
+  const [dice, setDice] = useState(
+    generateAllNewNumbers(numberOfDicesInTheGame)
+  );
+  const [isFinished, updateState] = useState(false);
+  const [bestScore, updateBestScore] = useState(0);
+  const [moves, updateMoves] = useState(0);
 
-  function generateNumbers(numberOfDices) {
+  function generateAllNewNumbers(numberOfDices) {
     const diceArray = [];
-    const maxValue = 6;
 
     for (let i = 0; i < numberOfDices; i++) {
-      const randomNumber = Math.ceil(Math.random() * maxValue);
-      diceArray.push({
-        id: crypto.randomUUID(),
-        value: randomNumber,
-        isActive: false,
-      });
+      diceArray.push(generateNewDie());
     }
     return diceArray;
+  }
+
+  function generateNewDie() {
+    return {
+      id: crypto.randomUUID(),
+      value: generateRandomNumber(),
+      isActive: false,
+    };
+  }
+
+  function generateRandomNumber() {
+    const maxValue = 6;
+    return Math.ceil(Math.random() * maxValue);
   }
 
   function toogle(id) {
@@ -30,7 +45,34 @@ function App() {
   }
 
   function rollDice() {
-    setDice(generateNumbers(10));
+    setDice(
+      dice.map((currentDice) => {
+        return currentDice.isActive !== true ? generateNewDie() : currentDice;
+      })
+    );
+    //Update number of moves
+    if (!isFinished) {
+      updateMoves((oldValue) => oldValue + 1);
+    }
+  }
+
+  useEffect(() => {
+    const isAllHeld = dice.every((die) => die.isActive);
+    const firstValue = dice[0].value;
+    const isAllHaveTheSameValue = dice.every((die) => firstValue === die.value);
+
+    if (isAllHeld & isAllHaveTheSameValue) {
+      endGame();
+    }
+  }, [dice]);
+
+  function endGame() {
+    updateState(true);
+    if (bestScore > moves || bestScore === 0) {
+      updateBestScore(moves);
+    }
+    updateMoves(0);
+    console.log("koniec");
   }
 
   const diceElements = dice.map((dice) => (
@@ -39,8 +81,14 @@ function App() {
 
   return (
     <main>
+      <h1 className="title">Tenzies</h1>
+      <p className="instructions">
+        Roll until all dice are the same. Click each die to freeze it at its
+        current value between rolls.
+      </p>
       <div className="die-container">{diceElements}</div>
-      <button onClick={() => rollDice()}>Roll</button>
+      <PlayButton gameStatus={isFinished} roll={() => rollDice()} />
+      <ScoreBoard bestScore={bestScore} currentMoves={moves} />
     </main>
   );
 }
