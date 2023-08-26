@@ -59,6 +59,7 @@ function App() {
   function startNewGame() {
     setDice(generateAllNewNumbers(numberOfDicesInTheGame));
     updateMoves(0);
+    updateState(false);
   }
 
   function endGame() {
@@ -86,7 +87,9 @@ function App() {
   // ============ Website ===========
   return (
     <main>
-      {isFinished && <Confetti />}
+      {isFinished && (
+        <Confetti width={window.innerWidth} height={window.innerHeight} />
+      )}
       <h1 className="title">Tenzies</h1>
       <p className="instructions">
         Roll until all dice are the same. Click each die to freeze it at its
